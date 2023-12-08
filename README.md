@@ -1,7 +1,1 @@
-# Kman Menu
-This is the repostitory for kman v7
-Credits:
-Mango
-FuckingClown
-
-https://discord.gg/kman
+<h3 align="center">Kman Menu V7</h3>
