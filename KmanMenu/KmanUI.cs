@@ -175,6 +175,11 @@ namespace KmanMenu
                             AssetLoader.Instance.PlayClick();
                             tracers = !tracers;
                         }
+                        if (GUI.Button(new Rect(230, 60, 100, 30), "Box ESP"))
+                        {
+                            AssetLoader.Instance.PlayClick();
+                            boxesp = !boxesp;
+                        }
                         GUI.Label(new Rect(40, 100, 100, 30), "Esp Color");
                         r = GUI.HorizontalSlider(new Rect(10, 120, 100, 20), r, 0, 255);
                         g = GUI.HorizontalSlider(new Rect(10, 150, 100, 20), g, 0, 255);
@@ -265,7 +270,7 @@ namespace KmanMenu
                     var gameobject = new GameObject("Line");
                     lineRenderer = gameobject.AddComponent<LineRenderer>();
                     lineRenderer.startColor = Espcolor;
-                    lineRenderer.endColor = Color.green;
+                    lineRenderer.endColor = Espcolor;
                     lineRenderer.startWidth = 0.01f;
                     lineRenderer.endWidth = 0.01f;
                     lineRenderer.positionCount = 2;
@@ -281,41 +286,44 @@ namespace KmanMenu
         {
             foreach (VRRig rig in GorillaParent.instance.vrrigs)
             {
-                GameObject go = new GameObject("box");
-                go.transform.position = rig.transform.position;
-                GameObject top = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                GameObject right = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                GameObject left = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                GameObject bottom = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(top.GetComponent<BoxCollider>());
-                Destroy(bottom.GetComponent<BoxCollider>());
-                Destroy(left.GetComponent<BoxCollider>());
-                Destroy(right.GetComponent<BoxCollider>());
-                top.transform.SetParent(go.transform);
-                top.transform.localPosition = new Vector3(0f, 1f / 2f - 0.02f / 2f, 0f);
-                top.transform.localScale = new Vector3(1f, 0.02f, 0.02f);
-                bottom.transform.SetParent(go.transform);
-                bottom.transform.localPosition = new Vector3(0f, (0f - 1f) / 2f + 0.02f / 2f, 0f);
-                bottom.transform.localScale = new Vector3(1f, 0.02f, 0.02f);
-                left.transform.SetParent(go.transform);
-                left.transform.localPosition = new Vector3((0f - 1f) / 2f + 0.02f / 2f, 0f, 0f);
-                left.transform.localScale = new Vector3(0.02f, 1f, 0.02f);
-                right.transform.SetParent(go.transform);
-                right.transform.localPosition = new Vector3(1f / 2f - 0.02f / 2f, 0f, 0f);
-                right.transform.localScale = new Vector3(0.02f, 1f, 0.02f);
+                if (rig != null && !rig.isOfflineVRRig && !rig.isMyPlayer)
+                {
+                    GameObject go = new GameObject("box");
+                    go.transform.position = rig.transform.position;
+                    GameObject top = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    GameObject right = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    GameObject left = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    GameObject bottom = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(top.GetComponent<BoxCollider>());
+                    Destroy(bottom.GetComponent<BoxCollider>());
+                    Destroy(left.GetComponent<BoxCollider>());
+                    Destroy(right.GetComponent<BoxCollider>());
+                    top.transform.SetParent(go.transform);
+                    top.transform.localPosition = new Vector3(0f, 1f / 2f - 0.02f / 2f, 0f);
+                    top.transform.localScale = new Vector3(1f, 0.02f, 0.02f);
+                    bottom.transform.SetParent(go.transform);
+                    bottom.transform.localPosition = new Vector3(0f, (0f - 1f) / 2f + 0.02f / 2f, 0f);
+                    bottom.transform.localScale = new Vector3(1f, 0.02f, 0.02f);
+                    left.transform.SetParent(go.transform);
+                    left.transform.localPosition = new Vector3((0f - 1f) / 2f + 0.02f / 2f, 0f, 0f);
+                    left.transform.localScale = new Vector3(0.02f, 1f, 0.02f);
+                    right.transform.SetParent(go.transform);
+                    right.transform.localPosition = new Vector3(1f / 2f - 0.02f / 2f, 0f, 0f);
+                    right.transform.localScale = new Vector3(0.02f, 1f, 0.02f);
 
-                top.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
-                bottom.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
-                left.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
-                right.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
+                    top.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
+                    bottom.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
+                    left.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
+                    right.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
 
-                top.GetComponent<Renderer>().material.color = Espcolor;
-                bottom.GetComponent<Renderer>().material.color = Espcolor;
-                left.GetComponent<Renderer>().material.color = Espcolor;
-                right.GetComponent<Renderer>().material.color = Espcolor;
+                    top.GetComponent<Renderer>().material.color = Espcolor;
+                    bottom.GetComponent<Renderer>().material.color = Espcolor;
+                    left.GetComponent<Renderer>().material.color = Espcolor;
+                    right.GetComponent<Renderer>().material.color = Espcolor;
 
-                go.transform.LookAt(go.transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
-                Destroy(go, Time.deltaTime);
+                    go.transform.LookAt(go.transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
+                    Destroy(go, Time.deltaTime);
+                }
             }
         }
         public void AdvancedWASD()

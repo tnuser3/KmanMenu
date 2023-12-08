@@ -10,7 +10,7 @@ namespace KmanMenu.Components
     {
         float FlushTimeout;
 
-        public void Update()
+        public void LateUpdate()
         {
             if (PhotonNetwork.InRoom)
             {

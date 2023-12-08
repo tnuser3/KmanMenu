@@ -25,6 +25,7 @@ namespace KmanMenu.Components
             _velocity = (transform.position - _previousvelocity) / Time.deltaTime;
             _previousvelocity = transform.position;
         }
+
         public Vector3 angularVelocity
         {
             get
@@ -32,6 +33,7 @@ namespace KmanMenu.Components
                 return rotationDelta;
             }
         }
+
         public Vector3 velocity
         {
             get

@@ -180,6 +180,21 @@ namespace KmanMenu
             menubg.transform.position = new Vector3(0.054f, 0, 0f);
             menubg.GetComponent<Renderer>().material.color = Color.black;
 
+            GradientColorKey[] colorkeys = new GradientColorKey[4];
+
+            colorkeys[0].color = Color.black;
+            colorkeys[0].time = 0f;
+
+            colorkeys[1].color = Color.red * 0.3f;
+            colorkeys[1].time = 0.5f;
+
+            colorkeys[2].color = Color.black;
+            colorkeys[2].time = 1f;
+
+            var changer = menubg.AddComponent<bgchanger>();
+            Gradient gradient = new Gradient();
+            gradient.colorKeys = colorkeys;
+            changer.Gradients = gradient;
 
             canvasObj = new GameObject();
             canvasObj.transform.parent = menu.transform;
@@ -207,26 +222,6 @@ namespace KmanMenu
             component.sizeDelta = new Vector2(0.28f, 0.05f);
             component.position = new Vector3(0.06f, 0f, 0.162f);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
-
-            GradientColorKey[] colorkeys = new GradientColorKey[7];
-            colorkeys[0].color = Color.red;
-            colorkeys[0].time = 0f;
-            colorkeys[1].color = Color.yellow;
-            colorkeys[1].time = 0.2f;
-            colorkeys[2].color = Color.green;
-            colorkeys[2].time = 0.3f;
-            colorkeys[3].color = Color.cyan;
-            colorkeys[3].time = 0.5f;
-            colorkeys[4].color = Color.blue;
-            colorkeys[4].time = 0.6f;
-            colorkeys[5].color = Color.magenta;
-            colorkeys[5].time = 0.8f;
-            colorkeys[6].color = Color.red;
-            colorkeys[6].time = 1f;
-            var changer = gameObject2.AddComponent<textchanger>();
-            Gradient gradient = new Gradient();
-            gradient.colorKeys = colorkeys;
-            changer.Gradients = gradient;
 
             AddPageButtons();
             string[] array2 = buttons.Skip(pageNumber * pageSize).Take(pageSize).ToArray();
@@ -422,6 +417,7 @@ namespace KmanMenu
                 Loader.AddComponent<Helper>();
                 Loader.AddComponent<Input>();
                 Loader.AddComponent<AssetLoader>();
+                Loader.AddComponent<RPCFlush>();
                 var patchers = new GameObject("kmanpatchers");
                 patchers.transform.SetParent(Loader.transform);
                 patchers.AddComponent<Patchers.GorillaNotPatchers.Patch>();
@@ -1725,6 +1721,7 @@ namespace KmanMenu
                 AssetLoader.Instance.PlayClick();
                 GorillaTagger.Instance.StartVibration(false, GorillaTagger.Instance.tagHapticStrength / 2, GorillaTagger.Instance.tagHapticDuration / 2);
                 Plugin.Toggle(this.relatedText);
+                Notif.ClearPastNotifications(100);
                 Plugin.framePressCooldown = Time.frameCount;
             }
         }
@@ -1793,4 +1790,24 @@ namespace KmanMenu
             }
         }
     }
+    public class bgchanger : MonoBehaviour
+    {
+        Renderer renderer;
+        public Gradient Gradients;
+
+        public void Start()
+        {
+            renderer = gameObject.GetComponent<Renderer>();
+        }
+
+        public void Update()
+        {
+            if (renderer != null)
+            {
+                float t = Mathf.PingPong(Time.time / 2f, 1f);
+                renderer.material.color = Gradients.Evaluate(t);
+            }
+        }
+    }
+
 }
