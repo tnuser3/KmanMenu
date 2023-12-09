@@ -13,7 +13,6 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 using Valve.VR;
 using Random = UnityEngine.Random;
 
@@ -79,17 +78,7 @@ namespace KmanMenu
             "Vibrate All {M}",
             "Slow Gun {M}",
             "Vibrate Gun {M}",
-
-
         };
-        void Awake()
-        {
-            debug = BepInEx.Logging.Logger.CreateLogSource("KMAN MENU");
-            debug.Log(BepInEx.Logging.LogLevel.Info, "KMAN MENU LOADED!");
-            var Harmony = new Harmony("com.Kman.KmanMenuV7");
-            Harmony.PatchAll();
-            debug.Log(LogLevel.Info, "Patched Harmony: " + Harmony.Id);
-        }
         static bool _init = false;
         private static int pageSize = 5;
         private static int pageNumber = 0;
@@ -133,14 +122,27 @@ namespace KmanMenu
                 }
             }
 
-            if (buttonsActive[num] == false)
+            if (buttonsActive[num])
             {
-                gameObject.GetComponent<Renderer>().material.color = Color.red;
+                gameObject.GetComponent<Renderer>().material.color = Color.red * 0.5f;
             }
-
-            if (buttonsActive[num] == true)
+            else
             {
-                gameObject.GetComponent<Renderer>().material.color = Color.green;
+                GradientColorKey[] colorkeys = new GradientColorKey[4];
+
+                colorkeys[0].color = Color.black;
+                colorkeys[0].time = 0f;
+
+                colorkeys[1].color = Color.red * 0.4f;
+                colorkeys[1].time = 0.5f;
+
+                colorkeys[2].color = Color.black;
+                colorkeys[2].time = 1f;
+
+                var changer = gameObject.AddComponent<bgchanger>();
+                Gradient gradient = new Gradient();
+                gradient.colorKeys = colorkeys;
+                changer.Gradients = gradient;
             }
 
             GameObject gameObject2 = new GameObject();
@@ -185,7 +187,7 @@ namespace KmanMenu
             colorkeys[0].color = Color.black;
             colorkeys[0].time = 0f;
 
-            colorkeys[1].color = Color.red * 0.3f;
+            colorkeys[1].color = Color.red * 0.4f;
             colorkeys[1].time = 0.5f;
 
             colorkeys[2].color = Color.black;
@@ -248,11 +250,27 @@ namespace KmanMenu
             gameObject.GetComponent<BoxCollider>().isTrigger = true;
             gameObject.transform.parent = menu.transform;
             gameObject.transform.rotation = Quaternion.identity;
-            gameObject.transform.localScale = new Vector3(0.09f, 0.15f, 0.98f);
+            gameObject.transform.localScale = new Vector3(0.09f, 0.15f, 0.945f);
             gameObject.transform.localPosition = new Vector3(0.56f, 0.5833f, 0f);
             gameObject.AddComponent<BtnCollider>().relatedText = "PreviousPage";
             gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
             gameObject.name = "back";
+            GradientColorKey[] colorkeys = new GradientColorKey[4];
+
+            colorkeys[0].color = Color.black;
+            colorkeys[0].time = 0f;
+
+            colorkeys[1].color = Color.red * 0.4f;
+            colorkeys[1].time = 0.5f;
+
+            colorkeys[2].color = Color.black;
+            colorkeys[2].time = 1f;
+
+            var changer = gameObject.AddComponent<bgchanger>();
+            Gradient gradient = new Gradient();
+            gradient.colorKeys = colorkeys;
+            changer.Gradients = gradient;
+
             GameObject gameObject2 = new GameObject();
             gameObject2.transform.parent = canvasObj.transform;
             gameObject2.name = "back";
@@ -263,22 +281,28 @@ namespace KmanMenu
             text.alignment = TextAnchor.MiddleCenter;
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 0;
+
             RectTransform component = text.GetComponent<RectTransform>();
             component.localPosition = Vector3.zero;
             component.sizeDelta = new Vector2(0.2f, 0.03f);
-            component.localPosition = new Vector3(0.064f, 0.175f, -0.04f);
+            component.localPosition = new Vector3(0.064f, 0.175f, 0.0036f);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
             component.localScale = new Vector3(1.3f, 1.3f, 1.3f);
+
+
             GameObject gameObject3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
             UnityEngine.Object.Destroy(gameObject3.GetComponent<Rigidbody>());
             gameObject3.GetComponent<BoxCollider>().isTrigger = true;
             gameObject3.transform.parent = menu.transform;
             gameObject3.transform.rotation = Quaternion.identity;
             gameObject3.name = "Next";
-            gameObject3.transform.localScale = new Vector3(0.09f, 0.15f, 0.98f);
+            gameObject3.transform.localScale = new Vector3(0.09f, 0.15f, 0.945f);
             gameObject3.transform.localPosition = new Vector3(0.56f, -0.5833f, 0f);
             gameObject3.AddComponent<BtnCollider>().relatedText = "NextPage";
             gameObject3.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
+            var changer2 = gameObject3.AddComponent<bgchanger>();
+            changer2.Gradients = gradient;
+
             GameObject gameObject4 = new GameObject();
             gameObject4.transform.parent = canvasObj.transform;
             gameObject4.name = "Next";
@@ -289,10 +313,11 @@ namespace KmanMenu
             text2.alignment = TextAnchor.MiddleCenter;
             text2.resizeTextForBestFit = true;
             text2.resizeTextMinSize = 0;
+
             RectTransform component2 = text2.GetComponent<RectTransform>();
             component2.localPosition = Vector3.zero;
             component2.sizeDelta = new Vector2(0.2f, 0.03f);
-            component2.localPosition = new Vector3(0.064f, -0.175f, -0.04f);
+            component2.localPosition = new Vector3(0.064f, -0.175f, 0.0036f);
             component2.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
             component2.localScale = new Vector3(1.3f, 1.3f, 1.3f);
 
@@ -311,6 +336,9 @@ namespace KmanMenu
             gameObject5.transform.localPosition = new Vector3(0.56f, -0.0076f, 0.26f);
             gameObject5.AddComponent<BtnCollider>().relatedText = "Cum";
             gameObject5.GetComponent<Renderer>().material.color = Color.red;
+            var changer55 = gameObject5.AddComponent<bgchanger>();
+            changer55.Gradients = gradient;
+
             GameObject gameObject6 = new GameObject();
             gameObject6.transform.parent = canvasObj.transform;
             gameObject6.name = "LeaveButton";
@@ -321,6 +349,7 @@ namespace KmanMenu
             text3.alignment = TextAnchor.MiddleCenter;
             text3.resizeTextForBestFit = true;
             text3.resizeTextMinSize = 0;
+
             RectTransform component3 = text3.GetComponent<RectTransform>();
             component3.localPosition = Vector3.zero;
             component3.sizeDelta = new Vector2(0.2f, 0.03f);
@@ -403,13 +432,15 @@ namespace KmanMenu
 
 
 
-        void Update()
+        void Awake()
         {
-
-
-            //Debug.Log(Mathf.Abs((float)(PhotonNetwork.Time - PhotonNetwork.ServerTimestamp)));
             if (!GameObject.Find("KmanV7Loader"))
             {
+                debug = BepInEx.Logging.Logger.CreateLogSource("KMAN MENU");
+                debug.Log(BepInEx.Logging.LogLevel.Info, "KMAN MENU LOADED!");
+                var Harmony = new Harmony("com.Kman.KmanMenuV7");
+                Harmony.PatchAll();
+                debug.Log(LogLevel.Info, "Patched Harmony: " + Harmony.Id);
                 Loader = new GameObject("KmanV7Loader");
                 Loader.AddComponent<Plugin>();
                 Loader.AddComponent<KmanUI>();
@@ -424,14 +455,9 @@ namespace KmanMenu
                 patchers.AddComponent<Patchers.Playfab.Patch>();
                 patchers.AddComponent<Patchers.Misc.Patch>();
                 patchers.AddComponent<Patchers.VRRigPatchers.Patch>();
-
-                debug = BepInEx.Logging.Logger.CreateLogSource("KMAN MENU");
-                debug.Log(BepInEx.Logging.LogLevel.Info, "KMAN MENU LOADED!");
-                var Harmony = new Harmony("com.Kman.KmanMenuV7");
-                Harmony.PatchAll();
-                debug.Log(LogLevel.Info, "Patched Harmony: " + Harmony.Id);
-
+                DontDestroyOnLoad(Loader);
                 _init = true;
+
             }
         }
 
@@ -1572,38 +1598,9 @@ namespace KmanMenu
                 }
                 if (buttonsActive[32])
                 {
-                    Player owner = Helper.instance.GetPhotonViewFromRig(Helper.instance.TouchingRig).Owner;
-                    if (owner != null)
-                    {
-                        GorillaGameManager.instance.photonView.RPC("LaunchSlingshotProjectile", owner, new object[]
-{
-                             GorillaLocomotion.Player.Instance.transform.position - new Vector3(0, 1, 0),
-                             new Vector3(0, 1, 0),
-                             -1674517839,
-                             163790326,
-                             true,
-                             GorillaGameManager.instance.IncrementLocalPlayerProjectileCount(),
-                             false,
-                             1f,
-                             1f,
-                             1f,
-                             1f,
-});
-                    }
                 }
                 if (buttonsActive[33])
                 {
-                    Player owner = (Helper.instance.TouchingRig) != null ? Helper.instance.GetPhotonViewFromRig(Helper.instance.TouchingRig).Owner : null;
-                    if (owner != null && Time.time > Helper.instance.kicktimer + 1)
-                    {
-                        if (GorillaComputer.instance.friendJoinCollider.playerIDsCurrentlyTouching.Contains(PhotonNetwork.LocalPlayer.UserId) && GorillaComputer.instance.friendJoinCollider.playerIDsCurrentlyTouching.Contains(owner.UserId))
-                        {
-                            PhotonNetworkController.Instance.shuffler = UnityEngine.Random.Range(0, 99999999).ToString().PadLeft(8, '0');
-                            PhotonNetworkController.Instance.keyStr = UnityEngine.Random.Range(0, 99999999).ToString().PadLeft(8, '0');
-                            GorillaGameManager.instance.photonView.RPC("JoinPubWithFriends", owner, PhotonNetworkController.Instance.shuffler, PhotonNetworkController.Instance.keyStr);
-                            Helper.instance.kicktimer = Time.time;
-                        }
-                    }
                 }
                 if (buttonsActive[34])
                 {

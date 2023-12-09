@@ -1,10 +1,5 @@
-﻿using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
-using System.Text;
-using System.Threading;
 using UnityEngine;
 
 namespace KmanMenu.Helpers

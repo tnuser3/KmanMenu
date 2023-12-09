@@ -1,9 +1,6 @@
 ﻿using HarmonyLib;
 using PlayFab;
 using PlayFab.Internal;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace KmanMenu.Patchers.Playfab

@@ -1,51 +1,63 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 using KmanMenu.Helpers.Notifacations;
 using UnityEngine;
 using GorillaNetworking;
 using System.Collections;
 using HarmonyLib;
 using ExitGames.Client.Photon;
-using UnityEngine.UIElements;
-using System.Reflection;
-using UnityEngine.XR.Interaction.Toolkit;
-using KmanMenu.Components;
+using BepInEx;
 
 namespace KmanMenu.Helpers.Helper
 {
     internal class Helper : MonoBehaviourPunCallbacks
     {
-        public static Helper instance { get { return _Instance; } }
-        private static Helper _Instance;
-        public static Room MyRoom;
-        public static string oldRoom;
-        private GameObject RightPlat;
-        private GameObject LeftPlat;
-        private GameObject[] RightPlat_Networked = new GameObject[9999];
-        private GameObject[] LeftPlat_Networked = new GameObject[9999];
-        public Vector3 scale = new Vector3(0.0125f, 0.28f, 0.3825f);
-        static float KickG;
-        static VRRig KickPlayer;
-        static bool DoOnceKick = true;
-        static GorillaTagManager GorillaTagManager;
+        GameObject Left;
+        GameObject LeftPlat;
+        GameObject Right;
+        GameObject RightPlat;
+        GameObject Test1;
+        GameObject Test2;
+        GameObject pointer;
+
+        GameObject[] LeftPlat_Networked = new GameObject[9999];
+        GameObject[] RightPlat_Networked = new GameObject[9999];
+
+        GorillaBattleManager GorillaBattleManager;
         GorillaHuntManager GorillaHuntManager;
-        static GorillaBattleManager GorillaBattleManager;
-        static GameObject pointer;
-        public VRRig lagrig;
+        GorillaTagManager GorillaTagManager;
+
+        LineRenderer lineRenderer;
+
+        VRRig KickPlayer;
         VRRig SlowingRig;
-        VRRig VibratingRig;
         VRRig Tagger;
+        VRRig VibratingRig;
+        VRRig lagrig;
+
+        Vector3 PrevLPos;
+        Vector3 PrevRPos;
+        Vector3 previousMousePosition;
+        Vector3 scale = new Vector3(0.0125f, 0.28f, 0.3825f);
+
         bool IsTaggedSelf;
+        bool[] istagged = new bool[100000];
+
         float TagAura;
-        public float kicktimer = -2;
+        float kicktimer = -2;
+        float reset;
+
+        int RnumL;
+
+        private static Helper _Instance;
+        public static Helper instance { get { return _Instance; } }
+        public static string oldRoom;
+
         public Vector3 GetMiddle(Vector3 vector)
         {
             return new Vector3(vector.x / 2f, vector.y / 2f, vector.z / 2f);
         }
+
         public PhotonView GetPhotonViewFromRig(VRRig rig)
         {
             PhotonView info = Traverse.Create(rig).Field("photonView").GetValue<PhotonView>();
@@ -56,6 +68,7 @@ namespace KmanMenu.Helpers.Helper
 
             return null;
         }
+
         public void Awake()
         {
             _Instance = this;
@@ -87,14 +100,17 @@ namespace KmanMenu.Helpers.Helper
             base.OnPlayerLeftRoom(otherPlayer);
             Notif.SendNotification(otherPlayer.NickName + " Has Left Room: " + oldRoom);
         }
+
         public void StartMatAll()
         {
             base.StartCoroutine(this.MatAll());
         }
+
         public void StartMatSelf()
         {
             base.StartCoroutine(this.MatSpamSelf());
         }
+
         public void ProcessTeleportGun()
         {
             if (Input.RightGrip && !Input.RightTrigger)
@@ -129,6 +145,7 @@ namespace KmanMenu.Helpers.Helper
                 }
             }
         }
+
         public void ProcessCheckPoint()
         {
             if (Input.RightGrip)
@@ -152,6 +169,7 @@ namespace KmanMenu.Helpers.Helper
                 pointer.GetComponent<Renderer>().material.color = Color.red;
             }
         }
+
         public void MagicMonkey()
         {
             if (Input.RightGrip && !Input.RightTrigger)
@@ -187,6 +205,7 @@ namespace KmanMenu.Helpers.Helper
                 UnityEngine.GameObject.Destroy(pointer);
             }
         }
+
         public void PlatformNetwork(EventData data)
         {
             if (data.Code == 110)
@@ -218,6 +237,7 @@ namespace KmanMenu.Helpers.Helper
                 LeftPlat_Networked[data.Sender] = null;
             }
         }
+
         public void Platforms()
         {
 
@@ -269,7 +289,7 @@ namespace KmanMenu.Helpers.Helper
                 }
             }
         }
-        
+
         public void SlowGun()
         {
             if (Input.RightGrip)
@@ -319,6 +339,7 @@ namespace KmanMenu.Helpers.Helper
             }
             UnityEngine.GameObject.Destroy(pointer);
         }
+
         public void VibrateGun()
         {
             if (Input.RightGrip)
@@ -419,6 +440,7 @@ namespace KmanMenu.Helpers.Helper
             }
             UnityEngine.GameObject.Destroy(pointer);
         }
+
         public void LagGun()
         {
             if (Input.RightGrip)
@@ -494,6 +516,7 @@ namespace KmanMenu.Helpers.Helper
             }
             Destroy(pointer);
         }
+
         public void InvisGun()
         {
             if (Input.RightGrip)
@@ -524,6 +547,7 @@ namespace KmanMenu.Helpers.Helper
             }
             UnityEngine.GameObject.Destroy(pointer);
         }
+
         private IEnumerator MatAll()
         {
             while (Plugin.buttonsActive[43] == true)
@@ -650,7 +674,7 @@ namespace KmanMenu.Helpers.Helper
             }
             yield break;
         }
-        bool[] istagged = new bool[100000];
+        
         private IEnumerator MatSpamSelf()
         {
             while (Plugin.buttonsActive[37] == true)
@@ -766,7 +790,8 @@ namespace KmanMenu.Helpers.Helper
             }
             yield break;
         }
-        private void ProcessTagAura(Photon.Realtime.Player pl)
+
+        public void ProcessTagAura(Photon.Realtime.Player pl)
         {
             if (Time.time > TagAura + 0.1)
             {
@@ -782,6 +807,7 @@ namespace KmanMenu.Helpers.Helper
                 TagAura = Time.time;
             }
         }
+
         public void TagAll()
         {
             if (GorillaGameManager.instance != null)
@@ -818,7 +844,7 @@ namespace KmanMenu.Helpers.Helper
                 }
             }
         }
-        
+
         public void TagGun()
         {
             if (Input.RightGrip)
@@ -864,12 +890,208 @@ namespace KmanMenu.Helpers.Helper
                 return;
             }
         }
-        public VRRig TouchingRig
+
+        public void Tracers()
         {
-            get
+            foreach (VRRig rig in GorillaParent.instance.vrrigs)
             {
-                RaycastHit lasthit = Traverse.Create(typeof(GorillaLocomotion.Player)).Field("lastHitInfoHand").GetValue<RaycastHit>();
-                return (lasthit.collider.GetComponent<VRRig>() != null) ? lasthit.collider.GetComponent<VRRig>() : null;
+                if (rig != null && !rig.isOfflineVRRig && !rig.isMyPlayer)
+                {
+                    var gameobject = new GameObject("Line");
+                    lineRenderer = gameobject.AddComponent<LineRenderer>();
+                    lineRenderer.startColor = KmanUI.Espcolor;
+                    lineRenderer.endColor = KmanUI.Espcolor;
+                    lineRenderer.startWidth = 0.01f;
+                    lineRenderer.endWidth = 0.01f;
+                    lineRenderer.positionCount = 2;
+                    lineRenderer.useWorldSpace = true;
+                    lineRenderer.SetPosition(0, GorillaLocomotion.Player.Instance.headCollider.transform.position);
+                    lineRenderer.SetPosition(1, rig.transform.position);
+                    lineRenderer.material.shader = Shader.Find("GUI/Text Shader");
+                    Destroy(lineRenderer, Time.deltaTime);
+                }
+            }
+        }
+
+        public void BoxESP()
+        {
+            foreach (VRRig rig in GorillaParent.instance.vrrigs)
+            {
+                if (rig != null && !rig.isOfflineVRRig && !rig.isMyPlayer)
+                {
+                    GameObject go = new GameObject("box");
+                    go.transform.position = rig.transform.position;
+                    GameObject top = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    GameObject right = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    GameObject left = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    GameObject bottom = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(top.GetComponent<BoxCollider>());
+                    Destroy(bottom.GetComponent<BoxCollider>());
+                    Destroy(left.GetComponent<BoxCollider>());
+                    Destroy(right.GetComponent<BoxCollider>());
+                    top.transform.SetParent(go.transform);
+                    top.transform.localPosition = new Vector3(0f, 1f / 2f - 0.02f / 2f, 0f);
+                    top.transform.localScale = new Vector3(1f, 0.02f, 0.02f);
+                    bottom.transform.SetParent(go.transform);
+                    bottom.transform.localPosition = new Vector3(0f, (0f - 1f) / 2f + 0.02f / 2f, 0f);
+                    bottom.transform.localScale = new Vector3(1f, 0.02f, 0.02f);
+                    left.transform.SetParent(go.transform);
+                    left.transform.localPosition = new Vector3((0f - 1f) / 2f + 0.02f / 2f, 0f, 0f);
+                    left.transform.localScale = new Vector3(0.02f, 1f, 0.02f);
+                    right.transform.SetParent(go.transform);
+                    right.transform.localPosition = new Vector3(1f / 2f - 0.02f / 2f, 0f, 0f);
+                    right.transform.localScale = new Vector3(0.02f, 1f, 0.02f);
+
+                    top.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
+                    bottom.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
+                    left.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
+                    right.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
+
+                    top.GetComponent<Renderer>().material.color = KmanUI.Espcolor;
+                    bottom.GetComponent<Renderer>().material.color = KmanUI.Espcolor;
+                    left.GetComponent<Renderer>().material.color = KmanUI.Espcolor;
+                    right.GetComponent<Renderer>().material.color = KmanUI.Espcolor;
+
+                    go.transform.LookAt(go.transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
+                    Destroy(go, Time.deltaTime);
+                }
+            }
+        }
+
+        public void AdvancedWASD()
+        {
+            GorillaTagger.Instance.rigidbody.velocity = new Vector3(0, 0.0735f, 0);
+            float NSpeed = KmanUI.speed * Time.deltaTime;
+            if (UnityInput.Current.GetKey(KeyCode.LeftShift) || UnityInput.Current.GetKey(KeyCode.RightShift))
+            {
+                NSpeed *= 10f;
+            }
+            if (UnityInput.Current.GetKey(KeyCode.LeftArrow) || UnityInput.Current.GetKey(KeyCode.A))
+            {
+                GorillaLocomotion.Player.Instance.transform.position += Camera.main.transform.right * -1f * NSpeed;
+            }
+            if (UnityInput.Current.GetKey(KeyCode.RightArrow) || UnityInput.Current.GetKey(KeyCode.D))
+            {
+                GorillaLocomotion.Player.Instance.transform.position += Camera.main.transform.right * NSpeed;
+            }
+            if (UnityInput.Current.GetKey(KeyCode.UpArrow) || UnityInput.Current.GetKey(KeyCode.W))
+            {
+                GorillaLocomotion.Player.Instance.transform.position += Camera.main.transform.forward * NSpeed;
+            }
+            if (UnityInput.Current.GetKey(KeyCode.DownArrow) || UnityInput.Current.GetKey(KeyCode.S))
+            {
+                GorillaLocomotion.Player.Instance.transform.position += Camera.main.transform.forward * -1f * NSpeed;
+            }
+            if (UnityInput.Current.GetKey(KeyCode.Space) || UnityInput.Current.GetKey(KeyCode.PageUp))
+            {
+                GorillaLocomotion.Player.Instance.transform.position += Camera.main.transform.up * NSpeed;
+            }
+            if (UnityInput.Current.GetKey(KeyCode.LeftControl) || UnityInput.Current.GetKey(KeyCode.PageDown))
+            {
+                GorillaLocomotion.Player.Instance.transform.position += Camera.main.transform.up * -1f * NSpeed;
+            }
+            if (UnityInput.Current.GetMouseButton(1))
+            {
+                Vector3 val = UnityInput.Current.mousePosition - previousMousePosition;
+                float num2 = GorillaLocomotion.Player.Instance.transform.localEulerAngles.y + val.x * 0.3f;
+                float num3 = GorillaLocomotion.Player.Instance.transform.localEulerAngles.x - val.y * 0.3f;
+                GorillaLocomotion.Player.Instance.transform.localEulerAngles = new Vector3(num3, num2, 0f);
+            }
+            previousMousePosition = UnityInput.Current.mousePosition;
+
+        }
+
+        public void SelfControlledPath()
+        {
+            GorillaLocomotion.Player.Instance.rightControllerTransform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
+            GorillaLocomotion.Player.Instance.leftControllerTransform.rotation = Quaternion.Euler(new Vector3(0, 0, -90));
+            if (UnityInput.Current.GetKey(KeyCode.A))
+            {
+                GorillaLocomotion.Player.Instance.transform.Rotate(0f, -1f, 0f);
+            }
+            if (UnityInput.Current.GetKey(KeyCode.D))
+            {
+                GorillaLocomotion.Player.Instance.transform.Rotate(0f, 1f, 0f);
+            }
+            if (UnityInput.Current.GetKey(KeyCode.W))
+            {
+                GorillaLocomotion.Player.Instance.transform.position += (GorillaLocomotion.Player.Instance.bodyCollider.transform.forward * Time.deltaTime) * 1;
+            }
+
+            if (!GameObject.Find("Test1"))
+            {
+                Test1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                Test1.name = "Test1";
+                Test1.GetComponent<SphereCollider>().enabled = false;
+                Test1.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                Test1.GetComponent<Renderer>().material.color = Color.red;
+            }
+            if (!GameObject.Find("Test2"))
+            {
+                Test2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                Test2.name = "Test2";
+                Test2.GetComponent<SphereCollider>().enabled = false;
+                Test2.GetComponent<Renderer>().material.color = Color.red;
+                Test2.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+            }
+
+            if (Left == null)
+            {
+                Left = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                Left.GetComponent<SphereCollider>().enabled = false;
+                Left.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+            }
+            if (Right == null)
+            {
+                Right = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                Right.GetComponent<SphereCollider>().enabled = false;
+                Right.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+            }
+            Physics.Raycast(Left.transform.position, -Left.transform.up, out RaycastHit Leftray, 5f, GorillaLocomotion.Player.Instance.locomotionEnabledLayers);
+            Physics.Raycast(Right.transform.position, -Right.transform.up, out RaycastHit Rightray, 5f, GorillaLocomotion.Player.Instance.locomotionEnabledLayers);
+            Left.transform.position = GorillaLocomotion.Player.Instance.headCollider.transform.position + GorillaLocomotion.Player.Instance.headCollider.transform.forward * 0f + GorillaLocomotion.Player.Instance.headCollider.transform.up * -0.1f + GorillaLocomotion.Player.Instance.headCollider.transform.right * 0.5f;
+            Right.transform.position = GorillaLocomotion.Player.Instance.headCollider.transform.position + GorillaLocomotion.Player.Instance.headCollider.transform.forward * 0f + GorillaLocomotion.Player.Instance.headCollider.transform.up * -0.1f + GorillaLocomotion.Player.Instance.headCollider.transform.right * -0.5f;
+
+            if (Rightray.point != null)
+            {
+                Test2.transform.position = Rightray.point;
+            }
+            if (Leftray.point != null)
+            {
+                Test1.transform.position = Leftray.point;
+            }
+            if (Time.time > reset + 0.65f)
+            {
+                if (RnumL >= 2)
+                {
+                    RnumL = 0;
+                }
+                else
+                {
+                    RnumL++;
+                }
+                if (RnumL == 2)
+                {
+                    RnumL = 0;
+                }
+                Debug.Log(RnumL);
+                reset = Time.time;
+                PrevLPos = Leftray.point;
+                PrevRPos = Rightray.point;
+                //LeftPos = GenerateRandomPointInFrontOfObject(GorillaLocomotion.Player.Instance.gameObject, Leftray);
+            }
+            else
+            {
+                if (RnumL == 0)
+                {
+                    GorillaLocomotion.Player.Instance.rightControllerTransform.position = Leftray.point;
+                    GorillaLocomotion.Player.Instance.leftControllerTransform.position = PrevRPos;
+                }
+                if (RnumL == 1)
+                {
+                    GorillaLocomotion.Player.Instance.rightControllerTransform.position = PrevLPos;
+                    GorillaLocomotion.Player.Instance.leftControllerTransform.position = Rightray.point;
+                }
             }
         }
     }
