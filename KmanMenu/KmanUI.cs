@@ -90,6 +90,7 @@ namespace KmanMenu
                     AssetLoader.Instance.PlayClick();
                     page = 3;
                 }
+                /*
                 if (GUI.Button(new Rect(450, 10, 100, 35), "Fun"))
                 {
                     AssetLoader.Instance.PlayClick();
@@ -99,7 +100,7 @@ namespace KmanMenu
                 {
                     AssetLoader.Instance.PlayClick();
                     page = 5;
-                }
+                }*/
                 GUI.EndGroup();
                 switch (page)
                 {
@@ -170,24 +171,25 @@ namespace KmanMenu
                         {
                             PhotonNetwork.Disconnect();
                         }
-                            for (int i = 0; i < PhotonNetwork.PlayerList.Length; i += 1)
+                        GUILayout.Space(90);
+                        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i += 1)
+                        {
+                            if (PhotonNetwork.PlayerList[i].CustomProperties["mods"] != null)
                             {
-                                if (PhotonNetwork.PlayerList[i].CustomProperties["mods"] != null)
-                                {
-                                    //var obj = JsonConvert.DeserializeObject<hashinfo>(PhotonNetwork.PlayerList[i].CustomProperties["mods"].ToString().Replace('[', ' ').Replace('"', char.Parse("'")));
-                                    GUI.Label(new Rect(10, 90 + (25 * i), 700, 200), "NAME:" + PhotonNetwork.PlayerList[i].NickName + " | MODS: " + "HAS MODS" + " | USERID: " + PhotonNetwork.PlayerList[i].UserId);
-                                }
-                                else
-                                {
-                                    GUI.Label(new Rect(10, 90 + (25 * i), 700, 200),"NAME: " + PhotonNetwork.PlayerList[i].NickName + " | MODS: NONE | USERID: " + PhotonNetwork.PlayerList[i].UserId);
-                                }
+                                //var obj = JsonConvert.DeserializeObject<hashinfo>(PhotonNetwork.PlayerList[i].CustomProperties["mods"].ToString().Replace('[', ' ').Replace('"', char.Parse("'")));
+                                GUILayout.Label("NAME:" + PhotonNetwork.PlayerList[i].NickName + " | MODS: " + PhotonNetwork.PlayerList[i].CustomProperties["mods"].ToString() + " | USERID: " + PhotonNetwork.PlayerList[i].UserId);
                             }
+                            else
+                            {
+                                GUILayout.Label("NAME: " + PhotonNetwork.PlayerList[i].NickName + " | MODS: NONE | USERID: " + PhotonNetwork.PlayerList[i].UserId);
+                            }
+                        }
                         break;
 
                     case 3:
                         GUI.skin.label.richText = true;
                         GUI.Label(new Rect(30, 60, 200, 30), "<b>Server Info</b>");
-                        GUI.Label(new Rect(10, 80, 400, 300), $"Server: {PhotonNetwork.Server}\nServer Address: {PhotonNetwork.ServerAddress}\nRegion: {PhotonNetwork.CloudRegion}\nUsers Online: {PhotonNetwork.CountOfPlayers}\nPlayers In Room: {PhotonNetwork.CountOfPlayersInRooms}\nNumber Of Rooms: {(PhotonNetwork.CountOfPlayersInRooms/10)+1}\nConnected: {PhotonNetwork.IsConnected}\nPing: {PhotonNetwork.GetPing()}\n");
+                        GUI.Label(new Rect(10, 80, 400, 300), $"Server: {PhotonNetwork.Server}\nServer Address: {PhotonNetwork.ServerAddress}\nRegion: {PhotonNetwork.CloudRegion}\nUsers Online: {PhotonNetwork.CountOfPlayers}\nPlayers In Room: {PhotonNetwork.CountOfPlayersInRooms}\nNumber Of Rooms: {(PhotonNetwork.CountOfPlayersInRooms / 10) + 1}\nConnected: {PhotonNetwork.IsConnected}\nPing: {PhotonNetwork.GetPing()}\n");
                         if (GUI.Button(new Rect(10, 250, 120, 25), "Connect To US"))
                         {
                             AssetLoader.Instance.PlayClick();
@@ -224,7 +226,7 @@ namespace KmanMenu
                 }
             }
         }
-        
+
         void Update()
         {
             if (Open)
@@ -304,66 +306,6 @@ namespace KmanMenu
 
                 }
 
-            }
-            if (spammer2)
-            {
-                Ray ray = GameObject.Find("Shoulder Camera").GetComponent<Camera>().ScreenPointToRay(UnityInput.Current.mousePosition);
-
-                RaycastHit raycastHit;
-                Physics.Raycast(ray.origin, ray.direction, out raycastHit);
-                if (pointer == null)
-                {
-                    pointer = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    Object.Destroy(pointer.GetComponent<Rigidbody>());
-                    Object.Destroy(pointer.GetComponent<SphereCollider>());
-                    pointer.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-                }
-                pointer.transform.position = raycastHit.point;
-                if (UnityInput.Current.GetMouseButton(0))
-                {
-                    Vector3 startPosition = GorillaTagger.Instance.offlineVRRig.transform.position;
-                    Vector3 targetPosition = raycastHit.point;
-                    Vector3 directionToTarget = (targetPosition - startPosition).normalized;
-                    float strength = 140f;
-                    directionToTarget *= strength;
-                    float random1 = UnityEngine.Random.Range(0f, 1f);
-                    float random2 = UnityEngine.Random.Range(0f, 1f);
-                    float random3 = UnityEngine.Random.Range(0f, 1f);
-                    Type photon = typeof(PhotonNetwork);
-                    MethodInfo ExecuteRpc = photon.GetMethod("ExecuteRpc", BindingFlags.Static | BindingFlags.NonPublic);
-                    MethodInfo RaiseEventInternal = photon.GetMethod("RaiseEventInternal", BindingFlags.Static | BindingFlags.NonPublic);
-                    RaiseEventOptions RaiseEventOptionsInternal = new RaiseEventOptions
-                    {
-                        Receivers = ReceiverGroup.All
-                    };
-                    Hashtable tabel = new Hashtable();
-                    tabel.Add(0, GorillaGameManager.instance.photonView.ViewID);
-                    tabel.Add(2, (int)PhotonNetwork.Time);
-                    tabel.Add(3, "LaunchSlingshotProjectile");
-                    tabel.Add(4,
-                    new object[]
-                        {
-                             startPosition,
-                             directionToTarget,
-                             -675036877,
-                             -1,
-                             true,
-                             GorillaGameManager.instance.IncrementLocalPlayerProjectileCount(),
-                            true,
-                            random1,
-                            random2,
-                             random3,
-                             1f,
-                        });
-                    RaiseEventInternal.Invoke(photon, new object[]
-                    {
-                    (byte)200,
-                    tabel,
-                    RaiseEventOptionsInternal,
-                    SendOptions.SendReliable
-                    });
-                    ExecuteRpc.Invoke(photon, new object[] { tabel, PhotonNetwork.LocalPlayer });
-                }
             }
             if (ESP)
             {
