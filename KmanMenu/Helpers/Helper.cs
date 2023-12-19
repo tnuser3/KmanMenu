@@ -76,6 +76,7 @@ namespace KmanMenu.Helpers.Helper
 
         public override void OnJoinedRoom()
         {
+            Notif.ClearAllNotifications();
             base.OnJoinedRoom();
             oldRoom = PhotonNetwork.CurrentRoom.Name;
 
@@ -83,6 +84,7 @@ namespace KmanMenu.Helpers.Helper
 
         public override void OnLeftRoom()
         {
+            Notif.ClearAllNotifications();
             base.OnLeftRoom();
             Notif.SendNotification("You have Left Room: " + oldRoom);
             oldRoom = string.Empty;
@@ -322,9 +324,10 @@ namespace KmanMenu.Helpers.Helper
                     Photon.Realtime.Player owner = Photonview.Owner;
                     if (Photonview != null || owner != null)
                     {
-                        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+                        if (PhotonNetwork.LocalPlayer.IsMasterClient && Time.time > mt + 0.5f)
                         {
                             Photonview.RPC("SetTaggedTime", owner);
+                            mt = Time.time;
                         }
                         pointer.GetComponent<Renderer>().material.color = new Color(0, 1, 0, 0.3f);
                     }
@@ -339,7 +342,7 @@ namespace KmanMenu.Helpers.Helper
             }
             UnityEngine.GameObject.Destroy(pointer);
         }
-
+        float mt;
         public void VibrateGun()
         {
             if (Input.RightGrip)
@@ -372,9 +375,10 @@ namespace KmanMenu.Helpers.Helper
                     Photon.Realtime.Player owner = Photonview.Owner;
                     if (Photonview != null || owner != null)
                     {
-                        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+                        if (PhotonNetwork.LocalPlayer.IsMasterClient && Time.time > mt + 0.5f)
                         {
                             Photonview.RPC("SetJoinTaggedTime", owner);
+                            mt = Time.time;
                         }
                         pointer.GetComponent<Renderer>().material.color = new Color(0, 1, 0, 0.3f);
                     }
@@ -1094,5 +1098,64 @@ namespace KmanMenu.Helpers.Helper
                 }
             }
         }
+
+        public void TouchKick()
+        {
+            for (int i = 0; i < Traverse.Create(GorillaTagger.Instance).Field("nonAllocHits").GetValue<int>(); i++)
+            {
+                var istag = TryToTag(Traverse.Create(GorillaTagger.Instance).Field("nonAllocRaycastHits").GetValue<RaycastHit[]>()[i], out Player owner);
+                if (istag)
+                {
+                    if (owner != null && Time.time > kicktimer + 1)
+                    {
+                        if (GorillaComputer.instance.friendJoinCollider.playerIDsCurrentlyTouching.Contains(PhotonNetwork.LocalPlayer.UserId) && GorillaComputer.instance.friendJoinCollider.playerIDsCurrentlyTouching.Contains(owner.UserId))
+                        {
+                            PhotonNetworkController.Instance.shuffler = UnityEngine.Random.Range(0, 99999999).ToString().PadLeft(8, '0');
+                            PhotonNetworkController.Instance.keyStr = UnityEngine.Random.Range(0, 99999999).ToString().PadLeft(8, '0');
+                            GorillaGameManager.instance.photonView.RPC("JoinPubWithFriends", owner, PhotonNetworkController.Instance.shuffler, PhotonNetworkController.Instance.keyStr);
+                            kicktimer = Time.time;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void TouchLag()
+        {
+            for (int i = 0; i < Traverse.Create(GorillaTagger.Instance).Field("nonAllocHits").GetValue<int>(); i++)
+            {
+                var istag = TryToTag(Traverse.Create(GorillaTagger.Instance).Field("nonAllocRaycastHits").GetValue<RaycastHit[]>()[i], out Player owner);
+                if (istag)
+                {
+                    if (owner != null && Time.time > kicktimer + 1)
+                    {
+                        if (GorillaComputer.instance.friendJoinCollider.playerIDsCurrentlyTouching.Contains(PhotonNetwork.LocalPlayer.UserId) && GorillaComputer.instance.friendJoinCollider.playerIDsCurrentlyTouching.Contains(owner.UserId))
+                        {
+                            PhotonNetworkController.Instance.shuffler = UnityEngine.Random.Range(0, 99999999).ToString().PadLeft(8, '0');
+                            PhotonNetworkController.Instance.keyStr = UnityEngine.Random.Range(0, 99999999).ToString().PadLeft(8, '0');
+                            GorillaGameManager.instance.photonView.RPC("JoinPubWithFriends", owner, PhotonNetworkController.Instance.shuffler, PhotonNetworkController.Instance.keyStr);
+                            kicktimer = Time.time;
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool TryToTag(RaycastHit hitInfo, out Photon.Realtime.Player touchedPlayer)
+        {
+            touchedPlayer = null;
+            if (PhotonNetwork.InRoom)
+            {
+                VRRig componentInParent = hitInfo.collider.GetComponentInParent<VRRig>();
+                var tempCreator = ((componentInParent != null) ? Traverse.Create(componentInParent).Field("creator").GetValue<Player>() : null);
+                if (tempCreator != null && PhotonNetwork.LocalPlayer != tempCreator)
+                {
+                    touchedPlayer = tempCreator;
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 }

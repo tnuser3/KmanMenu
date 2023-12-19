@@ -432,7 +432,7 @@ namespace KmanMenu
 
 
 
-        void Awake()
+        void Update()
         {
             if (!GameObject.Find("KmanV7Loader"))
             {
@@ -455,9 +455,6 @@ namespace KmanMenu
                 patchers.AddComponent<Patchers.Playfab.Patch>();
                 patchers.AddComponent<Patchers.Misc.Patch>();
                 patchers.AddComponent<Patchers.VRRigPatchers.Patch>();
-                DontDestroyOnLoad(Loader);
-                _init = true;
-
             }
         }
 
@@ -865,14 +862,8 @@ namespace KmanMenu
                             }
                             if (ProjType == 12)
                             {
-                                int[] hash = new int[]
-                                {
-                                    -666337545,
-                                    -160604350,
-                                    -1433633837,
-                                };
                                 buttons[16] = "Projectile Spam {Present}";
-                                Projhash = UnityEngine.Random.Range(0, hash.Length);
+                                Projhash = -666337545;
                                 Notif.SendNotification("Changed Projectile: Present");
                             }
                             if (ProjType >= 13)
@@ -895,7 +886,7 @@ namespace KmanMenu
                     }
                     if (Input.RightGrip)
                     {
-                        if (GorillaGameManager.instance != null && Time.time > projectiletimeout + 0.002f)
+                        if (GorillaGameManager.instance != null)
                         {
                             if (GorillaLocomotion.Player.Instance.rightControllerTransform.gameObject.GetComponent<VelocityTracker>() == null)
                             {
@@ -1011,7 +1002,7 @@ namespace KmanMenu
                                     -1433633837,
                                 };
                                 buttons[17] = "Projectile Spam {Present}";
-                                projgunhash = UnityEngine.Random.Range(0, hash.Length);
+                                projgunhash = -666337545;
                                 Notif.SendNotification("Changed Projectile: Present");
                             }
                             if (projguntype >= 13)
@@ -1041,7 +1032,7 @@ namespace KmanMenu
                         Vector3 vector = (point - position).normalized;
                         float d = 50f;
                         vector *= d;
-                        if (GorillaGameManager.instance != null && Time.time > projectiletimeout + 0.002f)
+                        if (GorillaGameManager.instance != null)
                         {
                             GorillaGameManager.instance.photonView.RPC("LaunchSlingshotProjectile", RpcTarget.Others, new object[]
                             {
@@ -1153,7 +1144,7 @@ namespace KmanMenu
                                     -1433633837,
                                 };
                                 buttons[18] = "Projectile Spam {Present}";
-                                projhalohash = UnityEngine.Random.Range(0, hash.Length);
+                                projhalohash = -666337545;
                                 Notif.SendNotification("Changed Projectile: Present");
                             }
                             if (projhalotype >= 13)
@@ -1176,7 +1167,7 @@ namespace KmanMenu
                     }
                     if (Input.RightGrip)
                     {
-                        if (GorillaGameManager.instance != null && Time.time > projectiletimeout + 0.002f)
+                        if (GorillaGameManager.instance != null)
                         {
                             chatgpt += 21 * Time.deltaTime;
                             float x = GorillaTagger.Instance.offlineVRRig.headConstraint.transform.position.x + 0.5f * Mathf.Cos(chatgpt);
@@ -1292,7 +1283,7 @@ namespace KmanMenu
                                     -1433633837,
                                 };
                                 buttons[19] = "Projectile Spam {Present}";
-                                Projhash = UnityEngine.Random.Range(0, hash.Length);
+                                Projhash = -666337545;
                                 Notif.SendNotification("Changed Projectile: Present");
                             }
                             if (ProjType >= 13)
@@ -1315,7 +1306,7 @@ namespace KmanMenu
                     }
                     if (Input.RightGrip)
                     {
-                        if (GorillaGameManager.instance != null && Time.time > projectiletimeout + 0.002f)
+                        if (GorillaGameManager.instance != null)
                         {
                             GorillaGameManager.instance.photonView.RPC("LaunchSlingshotProjectile", RpcTarget.Others, new object[]
                             {
@@ -1341,7 +1332,7 @@ namespace KmanMenu
                 }
                 if (buttonsActive[20])
                 {
-                    if (Input.RightTrigger && Time.time > projectiletimeout + 0.01)
+                    if (Input.RightTrigger)
                     {
                         projectiletimeout = Time.time;
                         GorillaGameManager.instance.photonView.RPC("LaunchSlingshotProjectile", RpcTarget.Others, new object[]
@@ -1366,7 +1357,7 @@ namespace KmanMenu
                 }
                 if (buttonsActive[21])
                 {
-                    if (Input.RightTrigger && Time.time > projectiletimeout + 0.01)
+                    if (Input.RightTrigger)
                     {
                         projectiletimeout = Time.time;
                         GorillaGameManager.instance.photonView.RPC("LaunchSlingshotProjectile", RpcTarget.Others, new object[]
@@ -1565,7 +1556,7 @@ namespace KmanMenu
                 {
                     if (GorillaGameManager.instance != null)
                     {
-                        GorillaGameManager.instance.photonView.RPC("LaunchSlingshotProjectile", RpcTarget.All, new object[]
+                        GorillaGameManager.instance.photonView.RPC("LaunchSlingshotProjectile", RpcTarget.Others, new object[]
                         {
                              GorillaLocomotion.Player.Instance.transform.position - new Vector3(0, 1,0),
                              Vector3.zero,
@@ -1579,7 +1570,7 @@ namespace KmanMenu
                              1f,
                              1f,
                         });
-                        GorillaGameManager.instance.photonView.RPC("LaunchSlingshotProjectile", RpcTarget.All, new object[]
+                        GorillaGameManager.instance.photonView.RPC("LaunchSlingshotProjectile", RpcTarget.Others, new object[]
 {
                              GorillaLocomotion.Player.Instance.transform.position - new Vector3(0, 1,0),
                              Vector3.zero,
@@ -1626,7 +1617,8 @@ namespace KmanMenu
 
                     if (GorillaComputer.instance.friendJoinCollider.playerIDsCurrentlyTouching.Contains(PhotonNetwork.LocalPlayer.UserId))
                     {
-                        GorillaTagger.Instance.myVRRig.RPC("InitializeNoobMaterial", RpcTarget.All, colortochange.r, colortochange.g, colortochange.b, true);
+                        GorillaTagger.Instance.myVRRig.RPC("InitializeNoobMaterial", RpcTarget.Others, colortochange.r, colortochange.g, colortochange.b, true);
+                        GorillaTagger.Instance.offlineVRRig.InitializeNoobMaterialLocal(colortochange.r, colortochange.g, colortochange.b, false);
                     }
                 }
                 if (buttonsActive[35])
@@ -1634,7 +1626,7 @@ namespace KmanMenu
                     if (Input.RightTrigger && PhotonNetwork.IsMasterClient && Time.time > sstimeout + 0.08)
                     {
                         sstimeout = Time.time;
-                        GorillaTagger.Instance.myVRRig.RPC("PlayTagSound", RpcTarget.All, Random.Range(0, 20), 1000);
+                        GorillaTagger.Instance.myVRRig.RPC("PlayTagSound", RpcTarget.All, Random.Range(0, 6), 1000);
                     }
                 }
                 if (buttonsActive[36])
@@ -1661,22 +1653,24 @@ namespace KmanMenu
                 }
                 if (buttonsActive[38])
                 {
-                    if (PhotonNetwork.LocalPlayer.IsMasterClient)
+                    if (PhotonNetwork.LocalPlayer.IsMasterClient && Time.time > mt + 0.5f)
                     {
                         foreach (Player p in PhotonNetwork.PlayerListOthers)
                         {
                             GorillaGameManager.instance.FindVRRigForPlayer(p).RPC("SetTaggedTime", p);
                         }
+                        mt = Time.time;
                     }
                 }
                 if (buttonsActive[39])
                 {
-                    if (PhotonNetwork.LocalPlayer.IsMasterClient)
+                    if (PhotonNetwork.LocalPlayer.IsMasterClient && Time.time > mt +0.5f)
                     {
                         foreach (Player p in PhotonNetwork.PlayerListOthers)
                         {
                             GorillaGameManager.instance.FindVRRigForPlayer(p).RPC("SetJoinTaggedTime", p);
                         }
+                        mt = Time.time;
                     }
                 }
                 if (buttonsActive[40])
@@ -1707,7 +1701,7 @@ namespace KmanMenu
         static bool StopEsp;
         static float chatgpt;
         static bool haskicked = false;
-        static float boardcooldown;
+        static float mt;
     }
     internal class BtnCollider : MonoBehaviour
     {

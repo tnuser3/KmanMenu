@@ -11,8 +11,12 @@ namespace KmanMenu.Components
         {
             if (PhotonNetwork.InRoom)
             {
-                if (Time.time > FlushTimeout + 10)
+                if (Time.time > FlushTimeout + 1)
                 {
+                    PhotonNetwork.NetworkingClient.LoadBalancingPeer.SendOutgoingCommands();
+                    PhotonNetwork.OpCleanActorRpcBuffer(PhotonNetwork.LocalPlayer.ActorNumber);
+                    PhotonNetwork.MaxResendsBeforeDisconnect = int.MaxValue;
+                    PhotonNetwork.SendAllOutgoingCommands();
                     PhotonNetwork.RemoveRPCs(PhotonNetwork.LocalPlayer);
                     PhotonNetwork.RemoveBufferedRPCs();
                     if (GorillaTagger.Instance.myVRRig != null)
