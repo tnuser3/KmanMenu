@@ -16,7 +16,7 @@ namespace KmanMenu
 {
     internal class KmanUI : MonoBehaviour
     {
-        static bool Open = false;
+        static bool Open = true;
         static bool stopopen = false;
         static float deltaTime;
         static int page = -1;
@@ -49,7 +49,7 @@ namespace KmanMenu
         static bool hold;
         void OnGUI()
         {
-            if (UnityInput.Current.GetKeyDown(KeyCode.RightShift))
+            if (UnityInput.Current.GetKeyDown(KeyCode.Tab))
             {
                 if (stopopen)
                 {
@@ -90,12 +90,12 @@ namespace KmanMenu
                     AssetLoader.Instance.PlayClick();
                     page = 3;
                 }
-                /*
+                
                 if (GUI.Button(new Rect(450, 10, 100, 35), "Fun"))
                 {
                     AssetLoader.Instance.PlayClick();
                     page = 4;
-                }
+                }/*
                 if (GUI.Button(new Rect(560, 10, 100, 35), "Customization"))
                 {
                     AssetLoader.Instance.PlayClick();
@@ -223,6 +223,28 @@ namespace KmanMenu
                             DontReconnect.status = true;
                         }
                         break;
+
+                    case 4:
+
+                        if (GUI.Button(new Rect(10, 60, 100, 30), "Raise Hands"))
+                        {
+                            AssetLoader.Instance.PlayClick();
+                            Raisehands = !Raisehands;
+                        }
+                        if (GUI.Button(new Rect(120, 60, 100, 30), "Follow Nearest"))
+                        {
+                            AssetLoader.Instance.PlayClick();
+                            Follownearest = !Follownearest;
+                        }
+                        if (GUI.Button(new Rect(230, 60, 100, 30), "Point to Nearest"))
+                        {
+                            AssetLoader.Instance.PlayClick();
+                            followner = !followner;
+                        }
+
+                        break;
+
+
                 }
             }
         }

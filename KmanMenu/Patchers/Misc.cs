@@ -22,18 +22,15 @@ namespace KmanMenu.Patchers.Misc
         {
             if (info.Sender != PhotonNetwork.LocalPlayer)
             {
+                if (Vector3.Distance(GorillaGameManager.instance.FindPlayerVRRig(info.Sender).transform.position, slingshotLaunchLocation) > 1.5f)
+                {
+                    return false;
+                }
                 if (Vector3.Distance(slingshotLaunchLocation, GorillaLocomotion.Player.Instance.transform.position) > 10)
                 {
                     return false;
                 }
                 if (ObjectPools.instance.GetPoolByHash(projHash).objectToPool.GetComponent<SlingshotProjectileTrail>() != null)
-                {
-                    return false;
-                }
-            }
-            if (info.Sender == PhotonNetwork.LocalPlayer)
-            {
-                if (Plugin.buttonsActive[31])
                 {
                     return false;
                 }
