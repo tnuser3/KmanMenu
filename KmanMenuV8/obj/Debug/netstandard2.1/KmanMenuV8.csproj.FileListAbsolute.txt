@@ -1,0 +1,5 @@
+C:\Users\bould\Desktop\KmanMenuV8\KmanMenuV8\KmanMenuV8\obj\Debug\netstandard2.1\KmanMenuV8.csproj.AssemblyReference.cache
+C:\Users\bould\Desktop\KmanMenuV8\KmanMenuV8\KmanMenuV8\obj\Debug\netstandard2.1\KmanMenuV8.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bould\Desktop\KmanMenuV8\KmanMenuV8\KmanMenuV8\obj\Debug\netstandard2.1\KmanMenuV8.AssemblyInfoInputs.cache
+C:\Users\bould\Desktop\KmanMenuV8\KmanMenuV8\KmanMenuV8\obj\Debug\netstandard2.1\KmanMenuV8.AssemblyInfo.cs
+C:\Users\bould\Desktop\KmanMenuV8\KmanMenuV8\KmanMenuV8\obj\Debug\netstandard2.1\KmanMenuV8.csproj.CoreCompileInputs.cache
