@@ -1,10 +1,6 @@
 ﻿using KmanMenu.Helpers.Notifacations;
 using KmanMenu.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using KmanMenu;
 
 namespace KmanMenu.Components
 {
